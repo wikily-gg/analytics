@@ -537,13 +537,12 @@ defmodule PlausibleWeb.Live.Sites do
         <div class="col-span-1 flex flex-col gap-y-5 bg-white dark:bg-gray-900 rounded-md shadow-sm p-6 group-hover:shadow-lg cursor-pointer transition duration-100">
           <div class="w-full flex items-center justify-between gap-x-2.5">
             <.favicon domain={@site.domain} />
-            <div class="flex-1 w-full">
-              <h3
-                class="text-gray-900 font-medium text-md sm:text-lg leading-[22px] truncate dark:text-gray-100"
-                style="width: calc(100% - 4rem)"
-              >
+            <div class="flex-1 w-full min-w-0 flex items-center gap-x-2">
+              <h3 class="text-gray-900 font-medium text-md sm:text-lg leading-[22px] truncate dark:text-gray-100 min-w-0 flex-1">
                 {@site.domain}
               </h3>
+              <.live_indicator :if={live_count(@sparkline) > 0} count={live_count(@sparkline)} />
+              <span class="shrink-0 w-10" aria-hidden="true"></span>
             </div>
           </div>
           <.site_stats sparkline={@sparkline} />
@@ -554,6 +553,27 @@ defmodule PlausibleWeb.Live.Sites do
         <.ellipsis_menu site={@site} can_manage?={List.first(@site.memberships).role != :viewer} />
       </div>
     </li>
+    """
+  end
+
+  defp live_count(sparkline) when is_map(sparkline), do: Map.get(sparkline, :current_visitors, 0)
+  defp live_count(_), do: 0
+
+  attr(:count, :integer, required: true)
+
+  def live_indicator(assigns) do
+    ~H"""
+    <span
+      class="shrink-0 inline-flex items-center gap-x-1 text-xs font-medium text-gray-600 dark:text-gray-300"
+      title={"#{@count} #{if @count == 1, do: "visitor", else: "visitors"} on site right now"}
+    >
+      <span class="relative flex size-2">
+        <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-60">
+        </span>
+        <span class="relative inline-flex rounded-full size-2 bg-green-500"></span>
+      </span>
+      {@count}
+    </span>
     """
   end
 
@@ -660,19 +680,39 @@ defmodule PlausibleWeb.Live.Sites do
             height={80}
           />
         </span>
-        <div class="flex justify-between items-end">
-          <div class="flex flex-col">
-            <p class="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100">
-              {large_number_format(@sparkline.visitors)}
-            </p>
-            <p class="text-gray-600 dark:text-gray-400">
-              visitor<span :if={@sparkline.visitors != 1}>s</span> in last 24h
-            </p>
-          </div>
-
-          <.percentage_change change={@sparkline.visitors_change} />
+        <div class="flex items-end justify-between gap-x-3">
+          <.site_stat
+            value={large_number_format(@sparkline.visitors)}
+            label={"visitor#{if @sparkline.visitors == 1, do: "", else: "s"} · 24h"}
+            change={@sparkline.visitors_change}
+          />
+          <.site_stat
+            value={large_number_format(Map.get(@sparkline, :pageviews, 0))}
+            label="pageviews · 24h"
+            change={Map.get(@sparkline, :pageviews_change, 0)}
+          />
         </div>
       </span>
+    </div>
+    """
+  end
+
+  attr(:value, :string, required: true)
+  attr(:label, :string, required: true)
+  attr(:change, :integer, required: true)
+
+  def site_stat(assigns) do
+    ~H"""
+    <div class="flex flex-col flex-1 min-w-0">
+      <div class="flex items-baseline gap-x-1.5 min-w-0">
+        <p class="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100 truncate">
+          {@value}
+        </p>
+        <.percentage_change change={@change} />
+      </div>
+      <p class="text-gray-600 dark:text-gray-400 text-xs sm:text-sm truncate">
+        {@label}
+      </p>
     </div>
     """
   end

@@ -103,7 +103,8 @@ defmodule PlausibleWeb.Live.SitesTest do
 
       html = render(lv)
       site_card = text_of_element(html, "li[data-domain=\"#{site.domain}\"]")
-      assert site_card =~ "3 visitors in last 24h"
+      assert site_card =~ "visitors · 24h"
+      assert site_card =~ "pageviews · 24h"
       assert site_card =~ site.domain
     end
 

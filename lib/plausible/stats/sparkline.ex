@@ -5,7 +5,7 @@ defmodule Plausible.Stats.Sparkline do
   """
 
   alias Plausible.{Site, Stats}
-  alias Plausible.Stats.QueryBuilder
+  alias Plausible.Stats.{CurrentVisitors, QueryBuilder}
   require Logger
 
   @spec parallel_overview([Site.t()], NaiveDateTime.t()) :: map()
@@ -32,8 +32,11 @@ defmodule Plausible.Stats.Sparkline do
   def overview_24h(view_or_site, now \\ NaiveDateTime.utc_now()) do
     stats = query_24h_stats(view_or_site, now)
     intervals = query_24h_intervals(view_or_site, now)
+    current = query_current_visitors(view_or_site)
 
-    Map.merge(stats, intervals)
+    stats
+    |> Map.merge(intervals)
+    |> Map.merge(current)
   end
 
   @spec safe_overview_24h(Site.t(), NaiveDateTime.t()) ::
@@ -85,16 +88,16 @@ defmodule Plausible.Stats.Sparkline do
       QueryBuilder.build!(site,
         now: DateTime.from_naive!(now, "Etc/UTC"),
         input_date_range: :"24h",
-        metrics: [:visitors],
+        metrics: [:visitors, :pageviews],
         include: [compare: :previous_period]
       )
 
     %Stats.QueryResult{
       results: [
         %{
-          metrics: [visitors],
+          metrics: [visitors, pageviews],
           comparison: %{
-            change: [visitors_change]
+            change: [visitors_change, pageviews_change]
           }
         }
       ]
@@ -102,7 +105,9 @@ defmodule Plausible.Stats.Sparkline do
 
     %{
       visitors: visitors,
-      visitors_change: visitors_change
+      visitors_change: visitors_change,
+      pageviews: pageviews,
+      pageviews_change: pageviews_change
     }
   end
 
@@ -136,6 +141,17 @@ defmodule Plausible.Stats.Sparkline do
       pageviews_change: pageviews_change,
       views_per_visit_change: views_per_visit_change
     }
+  end
+
+  defp query_current_visitors(view_or_site) do
+    current_visitors =
+      try do
+        CurrentVisitors.current_visitors(view_or_site)
+      catch
+        _, _ -> 0
+      end
+
+    %{current_visitors: current_visitors}
   end
 
   defp query_24h_intervals(view_or_site, now) do

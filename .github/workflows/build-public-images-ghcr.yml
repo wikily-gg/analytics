@@ -9,7 +9,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  GHCR_REPO: ghcr.io/plausible/community-edition
+  GHCR_REPO: ghcr.io/${{ github.repository }}
 
 jobs:
   build:
