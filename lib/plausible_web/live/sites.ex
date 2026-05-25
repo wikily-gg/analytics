@@ -542,6 +542,10 @@ defmodule PlausibleWeb.Live.Sites do
                 {@site.domain}
               </h3>
               <.live_indicator :if={live_count(@sparkline) > 0} count={live_count(@sparkline)} />
+              <.min30_indicator
+                :if={min30_count(@sparkline) > 0}
+                count={min30_count(@sparkline)}
+              />
               <span class="shrink-0 w-10" aria-hidden="true"></span>
             </div>
           </div>
@@ -559,6 +563,9 @@ defmodule PlausibleWeb.Live.Sites do
   defp live_count(sparkline) when is_map(sparkline), do: Map.get(sparkline, :current_visitors, 0)
   defp live_count(_), do: 0
 
+  defp min30_count(sparkline) when is_map(sparkline), do: Map.get(sparkline, :visitors_30min, 0)
+  defp min30_count(_), do: 0
+
   attr(:count, :integer, required: true)
 
   def live_indicator(assigns) do
@@ -572,6 +579,20 @@ defmodule PlausibleWeb.Live.Sites do
         </span>
         <span class="relative inline-flex rounded-full size-2 bg-green-500"></span>
       </span>
+      {@count}
+    </span>
+    """
+  end
+
+  attr(:count, :integer, required: true)
+
+  def min30_indicator(assigns) do
+    ~H"""
+    <span
+      class="shrink-0 inline-flex items-center gap-x-1 text-xs font-medium text-gray-600 dark:text-gray-300"
+      title={"#{@count} unique #{if @count == 1, do: "visitor", else: "visitors"} in the last 30 minutes"}
+    >
+      <Heroicons.clock mini class="size-3 text-gray-500 dark:text-gray-400" />
       {@count}
     </span>
     """
@@ -690,6 +711,7 @@ defmodule PlausibleWeb.Live.Sites do
             value={large_number_format(Map.get(@sparkline, :pageviews, 0))}
             label="pageviews · 24h"
             change={Map.get(@sparkline, :pageviews_change, 0)}
+            align="right"
           />
         </div>
       </span>
@@ -700,11 +722,18 @@ defmodule PlausibleWeb.Live.Sites do
   attr(:value, :string, required: true)
   attr(:label, :string, required: true)
   attr(:change, :integer, required: true)
+  attr(:align, :string, default: "left", values: ["left", "right"])
 
   def site_stat(assigns) do
     ~H"""
-    <div class="flex flex-col flex-1 min-w-0">
-      <div class="flex items-baseline gap-x-1.5 min-w-0">
+    <div class={[
+      "flex flex-col flex-1 min-w-0",
+      @align == "right" && "items-end text-right"
+    ]}>
+      <div class={[
+        "flex items-baseline gap-x-1.5 min-w-0",
+        @align == "right" && "flex-row-reverse"
+      ]}>
         <p class="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100 truncate">
           {@value}
         </p>

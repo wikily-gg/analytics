@@ -151,7 +151,14 @@ defmodule Plausible.Stats.Sparkline do
         _, _ -> 0
       end
 
-    %{current_visitors: current_visitors}
+    visitors_30min =
+      try do
+        CurrentVisitors.current_visitors(view_or_site, Duration.new!(minute: -30))
+      catch
+        _, _ -> 0
+      end
+
+    %{current_visitors: current_visitors, visitors_30min: visitors_30min}
   end
 
   defp query_24h_intervals(view_or_site, now) do
