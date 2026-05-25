@@ -14,7 +14,7 @@
 
     <script src="dist/handlebars.runtime-NWIB6V2M.js"></script>
     <script src="dist/handlebars.templates-K7URE6B4.js"></script>
-    <script src="dist/sidebar_items-68A645BF.js"></script>
+    <script src="dist/sidebar_items-890CEC6D.js"></script>
     <script src="docs_config.js"></script>
     <script async src="dist/html-PVRIOB7F.js"></script>
 
@@ -257,6 +257,16 @@ Pages
 
     <div class="summary-row">
       <div class="summary-signature">
+        <a href="#min30_indicator/1" data-no-tooltip translate="no">min30_indicator(assigns)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><h2>Attributes</h2><ul><li><code class="inline">count</code> (<code class="inline">:integer</code>) (required)</li></ul></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
         <a href="#mount/3" data-no-tooltip translate="no">mount(params, session, socket)</a>
 
       </div>
@@ -319,7 +329,7 @@ Pages
 
       </div>
 
-        <div class="summary-synopsis"><h2>Attributes</h2><ul><li><code class="inline">value</code> (<code class="inline">:string</code>) (required)</li><li><code class="inline">label</code> (<code class="inline">:string</code>) (required)</li><li><code class="inline">change</code> (<code class="inline">:integer</code>) (required)</li></ul></div>
+        <div class="summary-synopsis"><h2>Attributes</h2><ul><li><code class="inline">value</code> (<code class="inline">:string</code>) (required)</li><li><code class="inline">label</code> (<code class="inline">:string</code>) (required)</li><li><code class="inline">change</code> (<code class="inline">:integer</code>) (required)</li><li><code class="inline">align</code> (<code class="inline">:string</code>) - Defaults to <code class="inline">&quot;left&quot;</code>. Must be one of <code class="inline">&quot;left&quot;</code>, or <code class="inline">&quot;right&quot;</code>.</li></ul></div>
 
     </div>
 
@@ -436,7 +446,7 @@ Pages
     </a>
     <h1 class="signature" translate="no">ellipsis_menu(assigns)</h1>
 
-      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible_web/live/sites.ex#L580" class="icon-action" rel="help" aria-label="View Source">
+      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible_web/live/sites.ex#L601" class="icon-action" rel="help" aria-label="View Source">
        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
      </a>
 
@@ -456,7 +466,7 @@ Pages
     </a>
     <h1 class="signature" translate="no">ensure_can_take_ownership(site, team)</h1>
 
-      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible_web/live/sites.ex#L1001" class="icon-action" rel="help" aria-label="View Source">
+      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible_web/live/sites.ex#L1030" class="icon-action" rel="help" aria-label="View Source">
        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
      </a>
 
@@ -476,7 +486,7 @@ Pages
     </a>
     <h1 class="signature" translate="no">favicon(assigns)</h1>
 
-      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible_web/live/sites.ex#L816" class="icon-action" rel="help" aria-label="View Source">
+      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible_web/live/sites.ex#L845" class="icon-action" rel="help" aria-label="View Source">
        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
      </a>
 
@@ -496,7 +506,7 @@ Pages
     </a>
     <h1 class="signature" translate="no">globe_icon(assigns)</h1>
 
-      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible_web/live/sites.ex#L825" class="icon-action" rel="help" aria-label="View Source">
+      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible_web/live/sites.ex#L854" class="icon-action" rel="help" aria-label="View Source">
        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
      </a>
 
@@ -516,7 +526,7 @@ Pages
     </a>
     <h1 class="signature" translate="no">handle_event(binary, params, socket)</h1>
 
-      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible_web/live/sites.ex#L846" class="icon-action" rel="help" aria-label="View Source">
+      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible_web/live/sites.ex#L875" class="icon-action" rel="help" aria-label="View Source">
        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
      </a>
 
@@ -576,7 +586,7 @@ Pages
     </a>
     <h1 class="signature" translate="no">live_indicator(assigns)</h1>
 
-      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible_web/live/sites.ex#L564" class="icon-action" rel="help" aria-label="View Source">
+      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible_web/live/sites.ex#L571" class="icon-action" rel="help" aria-label="View Source">
        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
      </a>
 
@@ -587,6 +597,32 @@ Pages
 
 <h2 id="live_indicator/1-attributes" class="section-heading">
   <a href="#live_indicator/1-attributes" class="hover-link">
+    <i class="ri-link-m" aria-hidden="true"></i>
+  </a>
+  <span class="text">Attributes</span>
+</h2>
+<ul><li><code class="inline">count</code> (<code class="inline">:integer</code>) (required)</li></ul>
+  </section>
+</section>
+<section class="detail" id="min30_indicator/1">
+
+  <div class="detail-header">
+    <a href="#min30_indicator/1" class="detail-link" data-no-tooltip aria-label="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <h1 class="signature" translate="no">min30_indicator(assigns)</h1>
+
+      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible_web/live/sites.ex#L589" class="icon-action" rel="help" aria-label="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+     </a>
+
+
+  </div>
+
+  <section class="docstring">
+
+<h2 id="min30_indicator/1-attributes" class="section-heading">
+  <a href="#min30_indicator/1-attributes" class="hover-link">
     <i class="ri-link-m" aria-hidden="true"></i>
   </a>
   <span class="text">Attributes</span>
@@ -624,7 +660,7 @@ Pages
     </a>
     <h1 class="signature" translate="no">no_consolidated_view(overrides \\ [])</h1>
 
-      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible_web/live/sites.ex#L1044" class="icon-action" rel="help" aria-label="View Source">
+      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible_web/live/sites.ex#L1073" class="icon-action" rel="help" aria-label="View Source">
        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
      </a>
 
@@ -644,7 +680,7 @@ Pages
     </a>
     <h1 class="signature" translate="no">percentage_change(assigns)</h1>
 
-      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible_web/live/sites.ex#L723" class="icon-action" rel="help" aria-label="View Source">
+      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible_web/live/sites.ex#L752" class="icon-action" rel="help" aria-label="View Source">
        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
      </a>
 
@@ -690,7 +726,7 @@ Pages
     </a>
     <h1 class="signature" translate="no">search_form(assigns)</h1>
 
-      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible_web/live/sites.ex#L762" class="icon-action" rel="help" aria-label="View Source">
+      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible_web/live/sites.ex#L791" class="icon-action" rel="help" aria-label="View Source">
        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
      </a>
 
@@ -742,7 +778,7 @@ Pages
     </a>
     <h1 class="signature" translate="no">site_stat(assigns)</h1>
 
-      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible_web/live/sites.ex#L704" class="icon-action" rel="help" aria-label="View Source">
+      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible_web/live/sites.ex#L727" class="icon-action" rel="help" aria-label="View Source">
        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
      </a>
 
@@ -757,7 +793,7 @@ Pages
   </a>
   <span class="text">Attributes</span>
 </h2>
-<ul><li><code class="inline">value</code> (<code class="inline">:string</code>) (required)</li><li><code class="inline">label</code> (<code class="inline">:string</code>) (required)</li><li><code class="inline">change</code> (<code class="inline">:integer</code>) (required)</li></ul>
+<ul><li><code class="inline">value</code> (<code class="inline">:string</code>) (required)</li><li><code class="inline">label</code> (<code class="inline">:string</code>) (required)</li><li><code class="inline">change</code> (<code class="inline">:integer</code>) (required)</li><li><code class="inline">align</code> (<code class="inline">:string</code>) - Defaults to <code class="inline">&quot;left&quot;</code>. Must be one of <code class="inline">&quot;left&quot;</code>, or <code class="inline">&quot;right&quot;</code>.</li></ul>
   </section>
 </section>
 <section class="detail" id="site_stats/1">
@@ -768,7 +804,7 @@ Pages
     </a>
     <h1 class="signature" translate="no">site_stats(assigns)</h1>
 
-      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible_web/live/sites.ex#L666" class="icon-action" rel="help" aria-label="View Source">
+      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible_web/live/sites.ex#L687" class="icon-action" rel="help" aria-label="View Source">
        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
      </a>
 
@@ -794,7 +830,7 @@ Pages
     </a>
     <h1 class="signature" translate="no">sort_dropdown(assigns)</h1>
 
-      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible_web/live/sites.ex#L775" class="icon-action" rel="help" aria-label="View Source">
+      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible_web/live/sites.ex#L804" class="icon-action" rel="help" aria-label="View Source">
        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
      </a>
 
