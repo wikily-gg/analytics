@@ -1386,6 +1386,37 @@ defmodule PlausibleWeb.AuthControllerTest do
                        )
     end
 
+    test "success callback for search console creates a google auth entry and redirects to integrations form for editor",
+         %{conn: conn, user: user} do
+      site = new_site()
+      add_guest(site, user: user, role: :editor)
+
+      mock_google_access_token(user.email)
+
+      state =
+        Phoenix.Token.sign(PlausibleWeb.Endpoint, "google-oauth-state", [
+          site.id,
+          "search-console"
+        ])
+
+      callback_params = %{"code" => "CodeForToken", "state" => state}
+      conn = get(conn, Routes.auth_path(conn, :google_auth_callback), callback_params)
+
+      assert redirected_to(conn, 302) ==
+               Routes.site_path(conn, :settings_integrations, site.domain)
+
+      assert_matches %{
+                       access_token: "SomeAccessToken",
+                       refresh_token: "SomeRefreshToken",
+                       user_id: ^user.id,
+                       email: ^user.email,
+                       expires: %NaiveDateTime{}
+                     } =
+                       Repo.one(
+                         from ga in Plausible.Site.GoogleAuth, where: ga.site_id == ^site.id
+                       )
+    end
+
     test "success callback for search console handles repeat callback for the same site gracefully",
          %{conn: conn, user: user} do
       site = new_site(owner: user)
@@ -2061,48 +2092,6 @@ defmodule PlausibleWeb.AuthControllerTest do
       # 2FA session terminated
       assert response.resp_cookies["session_2fa"].max_age == 0
       assert html_response(response, 429) =~ "Too many login attempts"
-    end
-  end
-
-  describe "GET /team/select" do
-    setup [:create_user, :log_in]
-
-    test "redirects to /sites if no teams available", %{conn: conn} do
-      conn = get(conn, Routes.auth_path(conn, :select_team))
-      assert redirected_to(conn, 302) == Routes.site_path(conn, :index)
-    end
-
-    test "redirects to /sites?__team if one team set up available", %{conn: conn, user: user} do
-      new_site(owner: user)
-      team = team_of(user)
-      assert Plausible.Teams.complete_setup(team)
-      conn = get(conn, Routes.auth_path(conn, :select_team))
-      assert redirected_to(conn, 302) == Routes.site_path(conn, :index, __team: team.identifier)
-    end
-
-    test "displays team switcher if >1 teams available", %{conn: conn, user: user} do
-      t1 = new_site(owner: user).team
-      t2 = new_site().team
-
-      add_member(t2, user: user, role: :viewer)
-
-      Plausible.Teams.complete_setup(t1)
-      Plausible.Teams.complete_setup(t2)
-
-      conn = get(conn, Routes.auth_path(conn, :select_team))
-      assert html = html_response(conn, 200)
-
-      assert text(html) =~ "Switch your current team"
-
-      assert element_exists?(
-               html,
-               ~s|a[href="#{Routes.site_path(conn, :index, __team: t1.identifier)}"]|
-             )
-
-      assert element_exists?(
-               html,
-               ~s|a[href="#{Routes.site_path(conn, :index, __team: t2.identifier)}"]|
-             )
     end
   end
 

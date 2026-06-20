@@ -7,13 +7,19 @@ import {
   hasEventFilters,
   isRealTimeDashboard
 } from '../../util/filters'
-import { chooseBreakdownMetricsByContext } from '../breakdowns'
+import { defaultGetFilterInfo } from '../breakdowns'
 import {
   BREAKDOWN_REPORTS,
   BreakdownReportKey
 } from '../reports/reports-config'
-import { DetailsBreakdown } from '../modals/details-breakdown'
+import {
+  DetailsBreakdown,
+  DimensionCell,
+  DimensionCellProps
+} from '../modals/details-breakdown'
 import Modal from '../modals/modal'
+import { DetailsExternalLink } from './external-link'
+import { externalLinkForPage } from '../../util/url'
 
 export function PagesDetails({
   breakdownReportKey
@@ -29,16 +35,13 @@ export function PagesDetails({
   const isRevenueAvailable =
     BUILD_EXTRA && revenueAvailable(dashboardState, site)
 
-  let metrics = chooseBreakdownMetricsByContext(reportConfig.metricsByContext, {
+  const metrics = reportConfig.getMetrics({
     hasConversionGoalFilter: hasConversionGoalFilter(dashboardState),
     isRealtime: isRealTimeDashboard(dashboardState),
     isDetailed: true,
-    isRevenueAvailable: isRevenueAvailable
+    isRevenueAvailable: isRevenueAvailable,
+    hasEventFilters: hasEventFilters(dashboardState)
   })
-
-  if (metrics.includes('exit_rate') && hasEventFilters(dashboardState)) {
-    metrics = metrics.filter((m) => m !== 'exit_rate')
-  }
 
   return (
     <Modal>
@@ -47,9 +50,27 @@ export function PagesDetails({
         dimensionLabel={reportConfig.dimensionLabel}
         dimensions={reportConfig.dimensions}
         metrics={metrics}
+        alwaysOnFilters={reportConfig.alwaysOnFilters}
         defaultOrderBy={[['visitors', 'desc']]}
-        getExternalLinkUrl={reportConfig.getExternalLinkUrl}
+        DimensionElement={PagesDimensionElement}
       />
     </Modal>
+  )
+}
+
+const PagesDimensionElement = (props: DimensionCellProps) => {
+  const site = useSiteContext()
+  return (
+    <DimensionCell
+      text={props.row.dimensions[0]}
+      externalLink={
+        <DetailsExternalLink
+          href={externalLinkForPage(site, props.row.dimensions[0])}
+          isActive={props.isActive}
+        />
+      }
+      getFilterInfo={defaultGetFilterInfo}
+      {...props}
+    />
   )
 }
