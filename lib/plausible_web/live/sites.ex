@@ -31,6 +31,7 @@ defmodule PlausibleWeb.Live.Sites do
     socket =
       socket
       |> assign(:sparklines, %{})
+      |> assign(:group_totals, :loading)
       |> assign(:index_state, index_state)
       |> assign(init_consolidated_view_assigns(user, team))
       |> assign(:team_invitations, [])
@@ -100,6 +101,7 @@ defmodule PlausibleWeb.Live.Sites do
           empty_state_description: empty_state_description
         )
       end)
+      |> maybe_assign_group_totals()
 
     {:noreply, socket}
   end
@@ -128,6 +130,11 @@ defmodule PlausibleWeb.Live.Sites do
           <Heroicons.cog_6_tooth class="hidden group-hover:inline size-5 dark:text-gray-100 text-gray-900" />
         </.unstyled_link>
       </div>
+
+      <.group_totals_section
+        :if={@has_sites? and not @is_empty_state?}
+        group_totals={@group_totals}
+      />
 
       <div
         :if={not @is_empty_state?}
@@ -317,6 +324,80 @@ defmodule PlausibleWeb.Live.Sites do
           </div>
         </div>
       </div>
+    </div>
+    """
+  end
+
+  attr(:group_totals, :any, required: true)
+
+  def group_totals_section(assigns) do
+    ~H"""
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mt-6">
+      <.group_total_card title="Total" group_totals={@group_totals} key={:total} />
+      <.group_total_card title="Main" group_totals={@group_totals} key={:main} />
+      <.group_total_card title="Side" group_totals={@group_totals} key={:side} />
+    </div>
+    """
+  end
+
+  attr(:title, :string, required: true)
+  attr(:key, :atom, required: true, values: [:total, :main, :side])
+  attr(:group_totals, :any, required: true)
+
+  def group_total_card(assigns) do
+    stats =
+      case assigns.group_totals do
+        :loading -> :loading
+        totals -> Map.fetch!(totals, assigns.key)
+      end
+
+    assigns = assign(assigns, :stats, stats)
+
+    ~H"""
+    <div
+      data-test-id={"group-total-card-#{@key}"}
+      class="col-span-1 flex flex-col gap-y-4 bg-white dark:bg-gray-900 rounded-md shadow-sm p-6"
+    >
+      <h3 class="text-gray-900 font-medium text-md sm:text-lg leading-tight dark:text-gray-100">
+        {@title}
+      </h3>
+
+      <div
+        :if={@stats == :loading}
+        data-test-id="group-total-loading"
+        class="grid grid-cols-2 gap-x-4 gap-y-5 animate-pulse"
+      >
+        <div :for={_ <- 1..4} class="h-10 dark:bg-gray-750 bg-gray-100 rounded-md"></div>
+      </div>
+
+      <div :if={is_map(@stats)} class="grid grid-cols-2 gap-x-4 gap-y-5">
+        <.group_total_stat label="Active now" value={@stats.active_users} live?={true} />
+        <.group_total_stat label="Last 30 min" value={@stats.visitors_30min} />
+        <.group_total_stat label="Pageviews today" value={@stats.pageviews_today} />
+        <.group_total_stat label="Pageviews yesterday" value={@stats.pageviews_yesterday} />
+      </div>
+    </div>
+    """
+  end
+
+  attr(:label, :string, required: true)
+  attr(:value, :integer, required: true)
+  attr(:live?, :boolean, default: false)
+
+  def group_total_stat(assigns) do
+    ~H"""
+    <div class="flex flex-col min-w-0">
+      <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400 flex items-center gap-x-1.5 truncate">
+        <span :if={@live?} class="relative flex size-2 shrink-0">
+          <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-60">
+          </span>
+          <span class="relative inline-flex rounded-full size-2 bg-green-500"></span>
+        </span>
+        {@label}
+      </p>
+      <p class="text-lg sm:text-2xl font-bold text-gray-900 dark:text-gray-100 truncate">
+        {large_number_format(@value)}
+      </p>
     </div>
     """
   end
@@ -1046,6 +1127,18 @@ defmodule PlausibleWeb.Live.Sites do
 
   defp refresh_index_pins(socket) do
     assign(socket, :index_state, Index.refresh_pins(socket.assigns.index_state))
+  end
+
+  # Computed once, when the socket connects. The Total/Main/Side totals span all
+  # of the team's sites and are independent of search/sort/pagination, so we keep
+  # the already-computed map on subsequent `handle_params` runs.
+  defp maybe_assign_group_totals(socket) do
+    if connected?(socket) and socket.assigns.group_totals == :loading do
+      totals = Plausible.Stats.GroupTotals.for_domains(socket.assigns.index_state.domains)
+      assign(socket, :group_totals, totals)
+    else
+      socket
+    end
   end
 
   on_ee do

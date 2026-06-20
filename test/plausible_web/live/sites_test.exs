@@ -113,6 +113,39 @@ defmodule PlausibleWeb.Live.SitesTest do
       assert site_card =~ site.domain
     end
 
+    test "renders Total, Main and Side summary cards once connected", %{conn: conn, user: user} do
+      main = new_site(domain: "wikily.gg", owner: user)
+      new_site(domain: "ark-unity.com", owner: user)
+      side = new_site(domain: "some-side-wiki.com", owner: user)
+
+      now = NaiveDateTime.utc_now()
+
+      populate_stats(main, [
+        build(:pageview, user_id: 1, timestamp: NaiveDateTime.add(now, -1, :minute))
+      ])
+
+      populate_stats(side, [
+        build(:pageview, user_id: 2, timestamp: NaiveDateTime.add(now, -2, :minute))
+      ])
+
+      {:ok, lv, _html} = live(conn, "/sites")
+      html = render(lv)
+
+      assert element_exists?(html, ~s|[data-test-id="group-total-card-total"]|)
+      assert element_exists?(html, ~s|[data-test-id="group-total-card-main"]|)
+      assert element_exists?(html, ~s|[data-test-id="group-total-card-side"]|)
+
+      total_card = text_of_element(html, ~s|[data-test-id="group-total-card-total"]|)
+      assert total_card =~ "Active now"
+      assert total_card =~ "Last 30 min"
+      assert total_card =~ "Pageviews today"
+      assert total_card =~ "Pageviews yesterday"
+
+      # wikily.gg + ark-unity.com -> Main, some-side-wiki.com -> Side, both -> Total.
+      assert text_of_element(html, ~s|[data-test-id="group-total-card-main"]|) =~ "Active now"
+      assert text_of_element(html, ~s|[data-test-id="group-total-card-side"]|) =~ "Active now"
+    end
+
     test "filters by domain", %{conn: conn, user: user} do
       _site1 = new_site(domain: "first.example.com", owner: user)
       _site2 = new_site(domain: "second.example.com", owner: user)
